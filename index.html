@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text App</title>
+  <link rel="stylesheet" href="css/photon.css">
+  <style>
+    textarea {
+      width: 100%; 
+      height: 500px; 
+      resize: none; 
+      outline: none; 
+      border: none; 
+      padding: 20px; 
+      font-size: 20px; 
+      font-family: 'Arial', sans-serif; 
+      color: #333; 
+      background-color: #f5f5f5;
+      /* overflow: hidden; */
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar toolbar-header">
+    <div class="toolbar-actions">
+      <div class="btn-group">
+        <button class="btn btn-default">
+          <span class="icon icon-plus" onclick="increaseFont()"></span>
+        </button>
+        <button class="btn btn-default">
+          <span class="icon icon-minus" onclick="decreaseFont()"></span>
+        </button>
+      </div>
+
+      <button class="btn btn-default pull-right" onclick="saveText()">
+        <span class="icon icon-download"></span>
+        Save
+      </button>
+    </div>
+  </header>
+  
+  <div class="window-content">
+    <textarea placeholder="Enter Some Text Here..."></textarea>
+  </div>
+
+  <script>
+
+    const { ipcRenderer } = require('electron');
+
+    
+    document.addEventListener('DOMContentLoaded', () => {
+
+      const textarea = document.querySelector('textarea');
+
+      let defaultFontSize = 20;
+
+      // Define functions for button actions
+
+        window.increaseFont = function () {
+        textarea.style.fontSize = `${++defaultFontSize}px`
+      }
+
+        window.decreaseFont = function () {
+        textarea.style.fontSize = `${--defaultFontSize}px`
+      }
+
+      window.saveText = function () {
+        const text = textarea.value;
+        console.log(text);
+        window.electronAPI.save(text); // Use the exposed API
+      };
+
+      // ipcRenderer.on('saved', (event, results) => {
+      //   if(results==="success"){
+      //     console.log(`Note Saved Succesfully ${savedFile}`);
+      //     textarea.style.backgroundColor = "#000000";
+      //   } else {
+      //     textarea.style.backgroundColor = "red";
+      //     console.log('Error saving file');
+      //   }
+      // });
+
+
+      window.electronAPI.onSaved((event, results) => {
+        if (results === 'success') {
+          console.log(`Note Saved Successfully ${savedFile}`);
+          textarea.style.backgroundColor = "#000000";
+        } else {
+          textarea.style.backgroundColor = "red";
+          console.log('Error saving file');
+        }
+      });
+
+      // ipcRenderer.on('save-clicked', () => {
+      //   saveText();
+      // });
+
+    });
+
+
+  </script>
+</body>
+</html>
